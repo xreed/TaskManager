@@ -133,6 +133,7 @@ GEM
     mini_portile2 (2.4.0)
     minitest (5.11.3)
     msgpack (1.2.10)
+    multi_json (1.13.1)
     nio4r (2.3.1)
     nokogiri (1.10.3)
       mini_portile2 (~> 2.4.0)
@@ -176,6 +177,8 @@ GEM
       ffi (~> 1.0)
     ref (2.0.0)
     regexp_parser (1.5.1)
+    rollbar (2.20.2)
+      multi_json
     rubocop (0.71.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
@@ -281,6 +284,7 @@ DEPENDENCIES
   pg (>= 0.18, < 2.0)
   puma (~> 3.11)
   rails (~> 5.2.3)
+  rollbar
   rubocop
   sass-rails (~> 5.0)
   selenium-webdriver
