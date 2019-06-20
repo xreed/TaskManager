@@ -7,8 +7,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get edit" do
-    password = generate(:string)
-    user = create(:user, {password: password})
+    user = create(:user)
     get edit_admin_user_url user.id
     assert_response :success
   end
@@ -25,8 +24,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should patch update" do
-    password = generate(:string)
-    user = create(:user, {password: password})
+    user = create(:user)
     user_attrs = attributes_for(:user)
     patch admin_user_url user.id, params: { user: user_attrs }
     assert_response :redirect
