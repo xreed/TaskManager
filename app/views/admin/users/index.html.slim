@@ -3,7 +3,7 @@ h3 Users list
 .container
   .row
     .col-lg-10
-    .col-lg-2
+    .col-lg-2 class="search-box"
       = search_form_for(@q, url:admin_users_url, method: :get) do |f|
         = f.search_field :email_cont, placeholder: "Search by email"
 table.table
