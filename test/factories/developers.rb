@@ -3,6 +3,6 @@ FactoryBot.define do
     first_name { generate :string }
     last_name { generate :string }
     password { generate :string }
-    email
+    email { generate :email }
   end
 end
