@@ -23,3 +23,11 @@
    margin: 10px 10px 10px 0;
    padding-left: 0px;
  }
+
+ .errorsList {
+   color: red;
+ }
+
+ .createNewTaskBtn {
+   margin-bottom: 10px;
+ }

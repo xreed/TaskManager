@@ -7,6 +7,7 @@ import {
   FormControl,
 } from 'react-bootstrap'
 import { fetch } from './Fetch'
+import UserSelect from './UserSelect'
 
 export default class AddPopup extends React.Component {
   state = {
@@ -18,6 +19,7 @@ export default class AddPopup extends React.Component {
       last_name: null,
       email: null,
     },
+    errorsListShow: false,
   }
 
   handleNameChange = e => {
@@ -29,23 +31,51 @@ export default class AddPopup extends React.Component {
   }
 
   handleCardAdd = () => {
-    fetch('POST', window.Routes.api_v1_tasks_path(), {
-      task: {
-        name: this.state.name,
-        description: this.state.description,
-        assignee_id: this.state.assignee.id,
-      },
-    }).then(response => {
-      if (response.statusText == 'Created') {
-        this.props.onClose(true)
-      } else {
-        alert(response.status + ' - ' + response.statusText)
-      }
+    if (
+      this.state.name &&
+      this.state.description &&
+      this.state.assignee &&
+      this.state.assignee.id
+    ) {
+      fetch('POST', window.Routes.api_v1_tasks_path(), {
+        task: {
+          name: this.state.name,
+          description: this.state.description,
+          assignee_id: this.state.assignee.id,
+        },
+      }).then(response => {
+        if (response.statusText == 'Created') {
+          this.setState({
+            name: '',
+            description: '',
+            assignee: null,
+            errorsListShow: false,
+          })
+          this.props.onClose(true)
+        } else {
+          alert(response.status + ' - ' + response.statusText)
+        }
+      })
+    } else {
+      this.setState({ errorsListShow: true })
+    }
+  }
+
+  handleAssigneeChange = value => {
+    this.setState({ assignee: value })
+  }
+
+  handleFormClose = () => {
+    this.setState({
+      name: '',
+      description: '',
+      assignee: null,
+      errorsListShow: false,
     })
+    this.props.onClose()
   }
 
   render() {
-    console.log('!!!!!!!!!!!', this.state)
     return (
       <div>
         <Modal show={this.props.show} onHide={this.props.onClose}>
@@ -64,7 +94,6 @@ export default class AddPopup extends React.Component {
                   onChange={this.handleNameChange}
                 />
               </FormGroup>
-
               <FormGroup controlId="formDescriptionName">
                 <ControlLabel>Task description:</ControlLabel>
                 <FormControl
@@ -74,11 +103,27 @@ export default class AddPopup extends React.Component {
                   onChange={this.handleDecriptionChange}
                 />
               </FormGroup>
+              <FormGroup controlId="taskAssignee">
+                <ControlLabel>Assignee:</ControlLabel>
+                <UserSelect
+                  id="Assignee"
+                  onChange={this.handleAssigneeChange}
+                  value={this.state.assignee}
+                />
+              </FormGroup>
+              <FormGroup
+                controlId="errorsList"
+                hidden={!this.state.errorsListShow}
+              >
+                <ControlLabel className="errorsList">
+                  Please fill in all fields
+                </ControlLabel>
+              </FormGroup>
             </form>
           </Modal.Body>
 
           <Modal.Footer>
-            <Button onClick={this.props.onClose}>Close</Button>
+            <Button onClick={this.handleFormClose}>Close</Button>
             <Button bsStyle="primary" onClick={this.handleCardAdd}>
               Save changes
             </Button>
