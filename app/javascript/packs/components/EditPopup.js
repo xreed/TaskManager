@@ -7,6 +7,7 @@ import {
   FormControl,
 } from 'react-bootstrap'
 import { fetch } from './Fetch'
+import UserSelect from './UserSelect'
 
 export default class EditPopup extends React.Component {
   state = {
@@ -29,6 +30,7 @@ export default class EditPopup extends React.Component {
       },
     },
     isLoading: true,
+    errorsListShow: false,
   }
 
   loadCard = cardId => {
@@ -57,23 +59,35 @@ export default class EditPopup extends React.Component {
   }
 
   handleCardEdit = () => {
-    fetch(
-      'PUT',
-      window.Routes.api_v1_task_path(this.props.cardId, { format: 'json' }),
-      {
-        name: this.state.task.name,
-        description: this.state.task.description,
-        author_id: this.state.task.author.id,
-        assignee_id: this.state.task.assignee.id,
-        state: this.state.task.state,
-      }
-    ).then(response => {
-      if (response.statusText == 'OK') {
-        this.props.onClose(this.state.task.state)
-      } else {
-        alert('Update failed! ' + response.status + ' - ' + response.statusText)
-      }
-    })
+    if (
+      this.state.task.name &&
+      this.state.task.description &&
+      this.state.task.assignee &&
+      this.state.task.assignee.id
+    ) {
+      fetch(
+        'PUT',
+        window.Routes.api_v1_task_path(this.props.cardId, { format: 'json' }),
+        {
+          name: this.state.task.name,
+          description: this.state.task.description,
+          author_id: this.state.task.author.id,
+          assignee_id: this.state.task.assignee.id,
+          state: this.state.task.state,
+        }
+      ).then(response => {
+        if (response.statusText == 'OK') {
+          this.setState({ errorsListShow: false })
+          this.props.onClose(this.state.task.state)
+        } else {
+          alert(
+            'Update failed! ' + response.status + ' - ' + response.statusText
+          )
+        }
+      })
+    } else {
+      this.setState({ errorsListShow: true })
+    }
   }
 
   handleCardDelete = () => {
@@ -82,11 +96,25 @@ export default class EditPopup extends React.Component {
       window.Routes.api_v1_task_path(this.props.cardId, { format: 'json' })
     ).then(response => {
       if (response.statusText == 'OK') {
+        this.setState({ errorsListShow: false })
         this.props.onClose(this.state.task.state)
       } else {
         alert('DELETE failed! ' + response.status + ' - ' + response.statusText)
       }
     })
+  }
+
+  handleAuthorChange = value => {
+    this.setState({ task: { ...this.state.task, author: value } })
+  }
+
+  handleAssigneeChange = value => {
+    this.setState({ task: { ...this.state.task, assignee: value } })
+  }
+
+  handleFormClose = () => {
+    this.setState({ errorsListShow: false })
+    this.props.onClose()
   }
 
   render() {
@@ -114,6 +142,15 @@ export default class EditPopup extends React.Component {
 
           <Modal.Body>
             <form>
+              <FormGroup controlId="taskAuthor">
+                <ControlLabel>Author:</ControlLabel>
+                <UserSelect
+                  id="Author"
+                  isDisabled="true"
+                  value={this.state.task.author}
+                  onChange={this.handleAuthorChange}
+                />
+              </FormGroup>
               <FormGroup controlId="formTaskName">
                 <ControlLabel>Task name:</ControlLabel>
                 <FormControl
@@ -132,15 +169,30 @@ export default class EditPopup extends React.Component {
                   onChange={this.handleDecriptionChange}
                 />
               </FormGroup>
+              <FormGroup controlId="taskAssignee">
+                <ControlLabel>Assignee:</ControlLabel>
+                <UserSelect
+                  id="Assignee"
+                  onChange={this.handleAssigneeChange}
+                  value={this.state.task.assignee}
+                />
+              </FormGroup>
+              <FormGroup
+                controlId="errorsList"
+                hidden={!this.state.errorsListShow}
+              >
+                <ControlLabel className="errorsList">
+                  Please fill in all fields
+                </ControlLabel>
+              </FormGroup>
             </form>
-            Author: {this.state.author.first_name} {this.state.author.last_name}
           </Modal.Body>
 
           <Modal.Footer>
             <Button bsStyle="danger" onClick={this.handleCardDelete}>
               Delete
             </Button>
-            <Button onClick={this.props.onClose}>Close</Button>
+            <Button onClick={this.handleFormClose}>Close</Button>
             <Button bsStyle="primary" onClick={this.handleCardEdit}>
               Save changes
             </Button>

@@ -153,7 +153,11 @@ export default class TasksBoard extends React.Component {
     return (
       <div>
         <h1>Your tasks</h1>
-        <Button bsStyle="primary" onClick={this.handleAddShow}>
+        <Button
+          bsStyle="primary"
+          className="createNewTaskBtn"
+          onClick={this.handleAddShow}
+        >
           Create new task
         </Button>
         <Board
