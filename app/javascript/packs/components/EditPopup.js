@@ -33,21 +33,20 @@ export default class EditPopup extends React.Component {
     errorsListShow: false,
   }
 
-  loadCard = cardId => {
-    this.setState({ isLoading: true })
-    fetch(
-      'GET',
-      window.Routes.api_v1_task_path(cardId, { format: 'json' })
-    ).then(({ data }) => {
-      this.setState({ task: data })
-      this.setState({ isLoading: false })
-    })
-  }
-
   componentDidUpdate(prevProps) {
     if (this.props.cardId != null && this.props.cardId !== prevProps.cardId) {
       this.loadCard(this.props.cardId)
     }
+  }
+
+  loadCard = cardId => {
+    this.setState({ isLoading: true })
+    fetch('GET', Routes.api_v1_task_path(cardId, { format: 'json' })).then(
+      ({ data }) => {
+        this.setState({ task: data })
+        this.setState({ isLoading: false })
+      }
+    )
   }
 
   handleNameChange = e => {
@@ -59,49 +58,43 @@ export default class EditPopup extends React.Component {
   }
 
   handleCardEdit = () => {
-    if (
-      this.state.task.name &&
-      this.state.task.description &&
-      this.state.task.assignee &&
-      this.state.task.assignee.id
-    ) {
-      fetch(
-        'PUT',
-        window.Routes.api_v1_task_path(this.props.cardId, { format: 'json' }),
-        {
-          name: this.state.task.name,
-          description: this.state.task.description,
-          author_id: this.state.task.author.id,
-          assignee_id: this.state.task.assignee.id,
-          state: this.state.task.state,
-        }
-      ).then(response => {
-        if (response.statusText == 'OK') {
-          this.setState({ errorsListShow: false })
-          this.props.onClose(this.state.task.state)
-        } else {
-          alert(
-            'Update failed! ' + response.status + ' - ' + response.statusText
-          )
-        }
-      })
-    } else {
+    const { task } = this.state
+    if (!(task.name && task.description && task.assignee && task.assignee.id)) {
       this.setState({ errorsListShow: true })
+      return
     }
+
+    fetch(
+      'PUT',
+      Routes.api_v1_task_path(this.props.cardId, { format: 'json' }),
+      {
+        name: this.state.task.name,
+        description: this.state.task.description,
+        author_id: this.state.task.author.id,
+        assignee_id: this.state.task.assignee.id,
+        state: this.state.task.state,
+      }
+    ).then(response => {
+      this.processResponce(response, 'Update')
+    })
   }
 
   handleCardDelete = () => {
     fetch(
       'DELETE',
-      window.Routes.api_v1_task_path(this.props.cardId, { format: 'json' })
+      Routes.api_v1_task_path(this.props.cardId, { format: 'json' })
     ).then(response => {
-      if (response.statusText == 'OK') {
-        this.setState({ errorsListShow: false })
-        this.props.onClose(this.state.task.state)
-      } else {
-        alert('DELETE failed! ' + response.status + ' - ' + response.statusText)
-      }
+      this.processResponce(response, 'Delete')
     })
+  }
+
+  processResponce = (response, actionName) => {
+    if (response.statusText === 'OK') {
+      this.setState({ errorsListShow: false })
+      this.props.onClose(this.state.task.state)
+    } else {
+      alert(`${actionName} failed! ${response.status} - ${response.statusText}`)
+    }
   }
 
   handleAuthorChange = value => {

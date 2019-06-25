@@ -1,11 +1,15 @@
 class Admin::UsersController < Admin::ApplicationController
+  PER_PAGE_DEFAULT = 10
+
   def show
     @user = User.find(params[:id])
   end
 
   def index
     @q = User.ransack(params[:q])
-    @users = @q.result.order(:type).order(:id).page(params[:page]).per(10)
+    @count = params[:per_page] || PER_PAGE_DEFAULT
+
+    @users = @q.result.order(:type).order(:id).page(params[:page]).per(@count)
   end
 
   def edit
