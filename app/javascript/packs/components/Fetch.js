@@ -8,7 +8,7 @@ export function authenticityToken() {
 function headers() {
   return {
     Accept: '*/*',
-    'content-Type': 'application/json',
+    'Content-Type': 'application/json',
     'X-CSRF-Token': authenticityToken(),
     'X-Requested-With': 'XMLHttpRequest',
   }

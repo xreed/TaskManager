@@ -37,7 +37,7 @@ export default class AddPopup extends React.Component {
       this.state.assignee &&
       this.state.assignee.id
     ) {
-      fetch('POST', window.Routes.api_v1_tasks_path(), {
+      fetch('POST', Routes.api_v1_tasks_path(), {
         task: {
           name: this.state.name,
           description: this.state.description,

@@ -18,7 +18,7 @@ export default class UserSelect extends Component {
   loadOptions = inputValue => {
     return fetch(
       'GET',
-      window.Routes.api_v1_users_path({
+      Routes.api_v1_users_path({
         q: { first_name_or_last_name_cont: inputValue },
         format: 'json',
       })
